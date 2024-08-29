@@ -7,17 +7,18 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://fb-login-frontend.vercel.app'], // Update with your frontend production URL
+  origin: ['https://fb-login-frontend.vercel.app'], // Frontend production URL
   methods: 'GET,HEAD,PATCH,POST,PUT,DELETE',
 }));
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/myloginapp';
+const mongoURI = process.env.MONGODB_URI;
 
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log('MongoDB connection error:', err));
+
 
 // Define a User model
 const User = mongoose.model('User', new mongoose.Schema({

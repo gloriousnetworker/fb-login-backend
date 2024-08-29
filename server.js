@@ -7,8 +7,8 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://fb-login-frontend.vercel.app'], // Allow requests only from this origin
-  methods: 'GET,POST,PUT,DELETE', // Specify the allowed methods
+  origin: ['https://fb-login-frontend.vercel.app'], // Only allow the production frontend URL
+  methods: 'GET,HEAD,PATCH,POST,PUT,DELETE',
 }));
 app.use(bodyParser.json());
 

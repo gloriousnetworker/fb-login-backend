@@ -1,19 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const cors = require('cors'); // Import the CORS middleware
+const cors = require('cors');
 
 const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://fb-login-frontend.vercel.app'], // Only allow the production frontend URL
+  origin: ['https://fb-login-frontend.vercel.app'], // Update with your frontend production URL
   methods: 'GET,HEAD,PATCH,POST,PUT,DELETE',
 }));
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/myloginapp', { useNewUrlParser: true, useUnifiedTopology: true })
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/myloginapp';
+
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log('MongoDB connection error:', err));
 
@@ -28,11 +30,8 @@ app.post('/login', async (req, res) => {
   const { emailOrPhone, password } = req.body;
 
   try {
-    // Save user data to the database
     const user = new User({ emailOrPhone, password });
     await user.save();
-
-    // Send success response
     res.status(200).json({ message: 'User logged in successfully' });
   } catch (err) {
     console.error(err);
